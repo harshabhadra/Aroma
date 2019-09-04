@@ -28,4 +28,9 @@ public class FoodViewModel extends ViewModel {
     public LiveData<List<FoodItem>>getStepsList(int id){
         return foodRepository.getStepsListLiveData(id);
     }
+
+    //Return step item;
+    public FoodItem getStepItem(int foodId, int id){
+        return foodRepository.getStepItem(foodId, id);
+    }
 }

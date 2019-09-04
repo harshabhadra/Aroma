@@ -17,11 +17,14 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <activity android:name=".Ui.StepsDetails.StepsDetailsActivity"
+            android:configChanges="screenSize|orientation|keyboard"
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"
             >
         </activity>
         <activity
             android:name=".Ui.FoodRecepie.RecepieActivity"
-            android:parentActivityName=".Ui.FoodList.MainActivity"></activity>
+            android:parentActivityName=".Ui.FoodList.MainActivity">
+        </activity>
         <activity android:name=".Ui.FoodList.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

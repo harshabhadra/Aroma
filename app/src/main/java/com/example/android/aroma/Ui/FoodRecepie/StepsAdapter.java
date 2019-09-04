@@ -23,6 +23,7 @@ public class StepsAdapter extends RecyclerView.Adapter<StepsAdapter.StepsViewHol
 
     LayoutInflater inflater;
     List<FoodItem> foodItemList = new ArrayList<>();
+    int foodId = -1;
 
     public StepsAdapter(Context context) {
         inflater = LayoutInflater.from(context);
@@ -54,6 +55,12 @@ public class StepsAdapter extends RecyclerView.Adapter<StepsAdapter.StepsViewHol
         }
     }
 
+    public void setFoodId(int id){
+        foodId = id;
+        Log.e("StepAdapter","food is is: " + foodId);
+        notifyDataSetChanged();
+    }
+
     public class StepsViewHolder extends RecyclerView.ViewHolder {
 
         RecepieListBinding recepieListBinding;
@@ -64,12 +71,16 @@ public class StepsAdapter extends RecyclerView.Adapter<StepsAdapter.StepsViewHol
         }
 
         public void bindTo(FoodItem foodItem, int position) {
+
             recepieListBinding.setSteps(foodItem);
             recepieListBinding.getRoot().setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+
                     Intent stepIntent = new Intent(view.getContext(), StepsDetailsActivity.class);
                     stepIntent.putExtra("step",foodItem);
+                    stepIntent.putExtra("stepId", position);
+                    stepIntent.putExtra("foodId", foodId);
                     view.getContext().startActivity(stepIntent);
                 }
             });

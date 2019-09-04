@@ -10,7 +10,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.LongFunction;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -31,8 +30,18 @@ public class FoodRepository {
     //Store list of steps
     private MutableLiveData<List<FoodItem>> stepsListLiveData;
 
+    //Store Step object
+    private FoodItem foodItem;
+
     public static FoodRepository getInstance() {
         return new FoodRepository();
+    }
+
+    //Method to get a step item
+    public FoodItem getStepItem(int foodId, int id) {
+
+        loadFoodItem(foodId, id);
+        return foodItem;
     }
 
     //This Method will get list of Food items return in response from API
@@ -64,6 +73,50 @@ public class FoodRepository {
         return stepsListLiveData;
     }
 
+    private void loadFoodItem(int foodId, int id) {
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(Api.Jsonurl)
+                .addConverterFactory(ScalarsConverterFactory.create())
+                .build();
+        Api api = retrofit.create(Api.class);
+        Call<String> call = api.getFoodItem();
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (response.body() != null) {
+                    Log.e(TAG, "response step item successful");
+                    try {
+                        JSONArray jsonArray = new JSONArray(response.body());
+                        JSONObject jsonObject = jsonArray.getJSONObject(foodId);
+                        JSONArray stepsArray = jsonObject.getJSONArray("steps");
+
+                        JSONObject stepObj = stepsArray.getJSONObject(id);
+                        String id = stepObj.getString("id");
+                        String shortDes = stepObj.getString("shortDescription");
+                        String description = stepObj.getString("description");
+                        String videoUrl = stepObj.getString("videoURL");
+                        String thumbUrl = stepObj.getString("thumbnailURL");
+                        Log.e(TAG, "des: " + description);
+                        Log.e(TAG, "video: " + videoUrl);
+                        foodItem = new FoodItem(id, shortDes, description, videoUrl, thumbUrl);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    Log.e(TAG, "no response");
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+
+            }
+        });
+
+    }
+
     //Method to get steps from API
     private void loadStepsLiveData(int id) {
         List<FoodItem> stepsList = new ArrayList<>();
@@ -79,38 +132,31 @@ public class FoodRepository {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
 
-                Log.e(TAG, "Successful step response");
-                if (response.body() != null) {
-                    Log.e(TAG,"response is here");
-                    try {
-                        JSONArray jsonArray = new JSONArray(response.body());
-                        JSONObject jsonObject = jsonArray.getJSONObject(id - 1);
-                        JSONArray stepsArray = jsonObject.getJSONArray("steps");
-                        for (int i = 0; i < stepsArray.length(); i++) {
-                            JSONObject stepObj = stepsArray.getJSONObject(i);
+                try {
+                    JSONArray jsonArray = new JSONArray(response.body());
+                    JSONObject jsonObject = jsonArray.getJSONObject(id - 1);
+                    JSONArray stepsArray = jsonObject.getJSONArray("steps");
+                    for (int i = 0; i < stepsArray.length(); i++) {
+                        JSONObject stepObj = stepsArray.getJSONObject(i);
 
-                            String id = stepObj.getString("id");
-                            String shortDes = stepObj.getString("shortDescription");
-                            String description = stepObj.getString("description");
-                            String videoUrl = stepObj.getString("videoURL");
-                            String thumbUrl = stepObj.getString("thumbnailURL");
-                            FoodItem foodItem = new FoodItem(id, shortDes, description, videoUrl, thumbUrl);
-                            stepsList.add(foodItem);
-                            Log.e(TAG,"id: " + id);
-                            stepsListLiveData.setValue(stepsList);
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                        String id = stepObj.getString("id");
+                        String shortDes = stepObj.getString("shortDescription");
+                        String description = stepObj.getString("description");
+                        String videoUrl = stepObj.getString("videoURL");
+                        String thumbUrl = stepObj.getString("thumbnailURL");
+                        FoodItem foodItem = new FoodItem(id, shortDes, description, videoUrl, thumbUrl);
+                        stepsList.add(foodItem);
+                        stepsListLiveData.setValue(stepsList);
                     }
-                }else {
-                    Log.e(TAG,"no response for steps");
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
+
             }
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
 
-                Log.e(TAG,"Steps response unsuccessful");
             }
         });
 
@@ -155,13 +201,11 @@ public class FoodRepository {
                         e.printStackTrace();
                     }
                 } else {
-                    Log.e(TAG, " Ingredients Response is : " + response.body());
                 }
             }
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
-                Log.e(TAG, "Failed to get Response");
             }
         });
     }
@@ -185,7 +229,6 @@ public class FoodRepository {
 
                 if (response.body() != null) {
 
-                    Log.e(TAG, "Food list is here");
                     try {
                         JSONArray foodArray = new JSONArray(response.body());
                         for (int i = 0; i < foodArray.length(); i++) {

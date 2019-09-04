@@ -22,6 +22,7 @@ public class RecepieActivity extends AppCompatActivity {
         foodItem = getIntent().getParcelableExtra("id");
         if (foodItem != null) {
             id = foodItem.getItemId();
+            Log.e(TAG,"Food is is: " + id);
         }
     }
 

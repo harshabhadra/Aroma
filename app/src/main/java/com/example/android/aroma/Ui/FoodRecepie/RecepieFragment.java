@@ -10,18 +10,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.android.aroma.FoodItem;
 import com.example.android.aroma.FoodViewModel;
 import com.example.android.aroma.R;
 import com.example.android.aroma.databinding.RecepieFragmentBinding;
-
-import java.util.List;
 
 public class RecepieFragment extends Fragment {
 
@@ -50,16 +46,17 @@ public class RecepieFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        //Setting up ingredients and steps recyclerView
-        setIngredientsRecycler();
-        setStepsRecyclerView();
 
         //Getting the value of the food Id from activity to fragment
         RecepieActivity recepieActivity = (RecepieActivity) getActivity();
         if (recepieActivity != null) {
             id = recepieActivity.getId();
+            Log.e(TAG,"Food is is: " + id);
         }
 
+        //Setting up ingredients and steps recyclerView
+        setIngredientsRecycler();
+        setStepsRecyclerView();
         //Initializing ViewModel
         foodViewModel = ViewModelProviders.of(this).get(FoodViewModel.class);
 
@@ -73,10 +70,10 @@ public class RecepieFragment extends Fragment {
 
         //Getting list of steps
         foodViewModel.getStepsList(id).observe(this, foodItems -> {
-            if (foodItems != null){
-                Log.e(TAG," Step List is full");
+            if (foodItems != null) {
+                Log.e(TAG, " Step List is full");
                 stepsAdapter.setStepList(foodItems);
-            }else {
+            } else {
                 Log.e(TAG, "Step List is empty");
             }
         });
@@ -106,7 +103,7 @@ public class RecepieFragment extends Fragment {
     }
 
     //Set Up steps in recyclerView
-    private void setStepsRecyclerView(){
+    private void setStepsRecyclerView() {
 
         //Initializing layout manager
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
@@ -120,8 +117,7 @@ public class RecepieFragment extends Fragment {
 
         //Setting adapter
         stepsAdapter = new StepsAdapter(getActivity());
+        stepsAdapter.setFoodId(id);
         stepsRecyclerView.setAdapter(stepsAdapter);
-        Log.e(TAG,"Recycler Attached with adapter");
     }
-
 }
